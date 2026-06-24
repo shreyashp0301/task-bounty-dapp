@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/config.ts","./src/main.tsx","./src/soroban.ts","./src/types.ts","./src/vite-env.d.ts","./src/components/connectwallet.tsx","./src/components/createtaskform.tsx","./src/components/errormessage.tsx","./src/components/loadingspinner.tsx","./src/components/tasklist.tsx"],"version":"5.9.3"}
