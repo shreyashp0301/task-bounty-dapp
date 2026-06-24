@@ -30,7 +30,7 @@ cd frontend && npm install && npm run dev
 
 ## Demo
 Live: https://your-actual-url.netlify.app
-Video:https://youtu.be/vaoKI5aoy4o
+Video: https://youtu.be/vaoKI5aoy4o
 
 ## Contracts (Testnet)
 - TaskBoard: CABMAJSTYONKPTKCU4ZA5F57O54QBDUBY7NVZRECTJ33VL3RK6TNUWSV
