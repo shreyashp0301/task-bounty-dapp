@@ -41,6 +41,11 @@ export default function App() {
   const rewardsLocked = tasks
     .filter((t) => !t.completed)
     .reduce((sum, t) => sum + t.reward, 0n);
+  const myEarnings = wallet.publicKey
+    ? tasks
+        .filter((t) => t.completed && t.assignee === wallet.publicKey)
+        .reduce((sum, t) => sum + t.reward, 0n)
+    : 0n;
 
   return (
     <div className="app">
@@ -77,6 +82,10 @@ export default function App() {
               <div className="stat-card">
                 <span className="stat-label">Rewards Locked</span>
                 <span className="stat-value">{rewardsLocked > 0n ? formatReward(rewardsLocked) : '—'}</span>
+              </div>
+              <div className="stat-card">
+                <span className="stat-label">My Earnings</span>
+                <span className="stat-value accent">{myEarnings > 0n ? `+${formatReward(myEarnings)}` : '—'}</span>
               </div>
             </div>
 

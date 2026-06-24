@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ClipboardList, UserCheck, CheckCircle, CircleDot, User } from 'lucide-react';
+import { ClipboardList, UserCheck, CheckCircle, CircleDot, User, CheckCheck } from 'lucide-react';
 import { getAllTasks, assignTask, completeTask, formatReward } from '../soroban';
 import type { Task } from '../types';
 import { ErrorMessage } from './ErrorMessage';
 import { LoadingSpinner } from './LoadingSpinner';
+
+type Filter = 'all' | 'mine';
 
 interface Props {
   publicKey: string;
@@ -16,6 +18,7 @@ export function TaskList({ publicKey, refreshKey, onTasksUpdate }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<Record<string, boolean>>({});
+  const [filter, setFilter] = useState<Filter>('all');
 
   const fetchTasks = useCallback(async () => {
     setLoading(true);
@@ -67,10 +70,29 @@ export function TaskList({ publicKey, refreshKey, onTasksUpdate }: Props) {
   const canComplete = (task: Task) =>
     !task.completed && task.assignee === publicKey;
 
+  const filtered = filter === 'mine'
+    ? tasks.filter((t) => t.creator === publicKey || t.assignee === publicKey)
+    : tasks;
+
   const statusIcon = (task: Task) => {
+    if (task.completed && task.assignee === publicKey) return <CheckCheck size={12} />;
     if (task.completed) return <CheckCircle size={12} />;
     if (task.assignee) return <CircleDot size={12} />;
     return <CircleDot size={12} />;
+  };
+
+  const statusLabel = (task: Task) => {
+    if (task.completed && task.assignee === publicKey) return 'Reward Claimed';
+    if (task.completed) return 'Done';
+    if (task.assignee) return 'Assigned';
+    return 'Open';
+  };
+
+  const statusClass = (task: Task) => {
+    if (task.completed && task.assignee === publicKey) return 'status-claimed';
+    if (task.completed) return 'status-done';
+    if (task.assignee) return 'status-assigned';
+    return 'status-open';
   };
 
   return (
@@ -80,28 +102,43 @@ export function TaskList({ publicKey, refreshKey, onTasksUpdate }: Props) {
           <ClipboardList size={18} />
           Tasks
         </h2>
-        {!loading && <span className="task-count">{tasks.length} total</span>}
+        {!loading && <span className="task-count">{filtered.length} / {tasks.length} total</span>}
+      </div>
+
+      <div className="task-filters">
+        <button
+          className={`task-filter-btn ${filter === 'all' ? 'active' : ''}`}
+          onClick={() => setFilter('all')}
+        >
+          All
+        </button>
+        <button
+          className={`task-filter-btn ${filter === 'mine' ? 'active' : ''}`}
+          onClick={() => setFilter('mine')}
+        >
+          My Tasks
+        </button>
       </div>
 
       {loading && <LoadingSpinner label="Loading tasks..." />}
       {error && <ErrorMessage message={error} onDismiss={() => setError(null)} />}
 
-      {!loading && tasks.length === 0 && (
+      {!loading && filtered.length === 0 && (
         <div className="empty-state">
           <ClipboardList size={48} className="empty-icon" />
-          <h3>No tasks yet</h3>
-          <p>Create your first task above to get started.</p>
+          <h3>{filter === 'mine' ? 'No tasks for you yet' : 'No tasks yet'}</h3>
+          <p>{filter === 'mine' ? 'Create a task or get assigned to see them here.' : 'Create your first task above to get started.'}</p>
         </div>
       )}
 
       <div className="task-grid">
-        {tasks.map((task) => (
+        {filtered.map((task) => (
           <div key={task.id} className={`task-card ${task.completed ? 'completed' : ''}`}>
             <div className="task-header">
               <span className="task-id">#{task.id}</span>
-              <span className={`task-status ${task.completed ? 'status-done' : task.assignee ? 'status-assigned' : 'status-open'}`}>
+              <span className={`task-status ${statusClass(task)}`}>
                 {statusIcon(task)}
-                {task.completed ? 'Done' : task.assignee ? 'Assigned' : 'Open'}
+                {statusLabel(task)}
               </span>
             </div>
 
@@ -113,7 +150,10 @@ export function TaskList({ publicKey, refreshKey, onTasksUpdate }: Props) {
                 Reward:
               </span>
               <span className="meta-value">{formatReward(task.reward)}</span>
-              {task.assignee && (
+              {task.completed && task.assignee === publicKey && (
+                <span className="task-claimed-amount">+{formatReward(task.reward)} earned</span>
+              )}
+              {task.assignee && !task.completed && (
                 <span className="task-assignee">
                   <User size={12} />
                   {task.assignee.slice(0, 4)}...{task.assignee.slice(-4)}

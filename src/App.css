@@ -253,7 +253,7 @@ body::after {
 /* ─── Stats Bar ────────────────────────────────────────────────── */
 .stats-bar {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: var(--space-lg);
 }
 
@@ -791,6 +791,50 @@ body::after {
   border-radius: 50%;
   background: var(--warning);
   box-shadow: 0 0 6px rgba(245, 158, 11, 0.5);
+}
+
+/* ─── Filter Tabs ──────────────────────────────────────────────── */
+.task-filters {
+  display: flex;
+  gap: 6px;
+  margin-bottom: var(--space-lg);
+}
+
+.task-filter-btn {
+  padding: 6px 16px;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all 0.15s;
+}
+
+.task-filter-btn:hover {
+  border-color: var(--border-hover);
+  color: var(--text);
+}
+
+.task-filter-btn.active {
+  background: var(--primary-subtle);
+  border-color: var(--primary);
+  color: var(--primary-hover);
+}
+
+/* ─── Reward Claimed Badge ─────────────────────────────────────── */
+.status-claimed {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--success);
+}
+
+.task-claimed-amount {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--success);
+  font-family: var(--font-mono);
 }
 
 /* ─── Responsive: Tablet & Small Desktop ───────────────────────── */
